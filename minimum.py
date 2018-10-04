@@ -30,7 +30,6 @@ def kth_min_nlogn(k, list):
 def kth_min_n(k,list):
 # return kth minimum number in a list, O(n) time
 
-# optimization 1: store index of min, replace with max. find absolute min each iteration
 # optimization 2: if k > n/2, find n-k max elements
     min = [''] * k
     min[0] = list[0]
@@ -50,13 +49,46 @@ def kth_min_n(k,list):
     print min
     return min[k - 1]
 
+def kth_min_n_opt1(k, list):
+# optimization 1: store index of min, replace with max. find absolute min each iteration
+# which saves a comparison on the innermost loop while finding kth min
+# plus no longer need to keep track of mins as we go!
+    list_working = list[:]
+    min = list_working[0]
+    max = list_working[0]
+    min_index = None
+    max_index = None
+    # first find min, max
+    for i in range(len(list_working)):
+        if list_working[i] < min:
+            min = list_working[i]
+            min_index = i
+        if list_working[i] > max:
+            max = list_working[i]
+            max_index = i
+    # then fill in min + 1 until we get to kth min
+    for round in range(1, k):
+        # replace min in list_working with max
+        list_working[min_index] = max
+        min = max
+        for i in range(len(list_working)):
+            # here we only need to look for the minimum of updated list_working
+            # instead of a number that is greater than previously found min
+            if list_working[i] < min:
+                min = list_working[i]
+                min_index = i
+
+    return min
+
 def main():
     list = [353, 635, 132, 665, 382, 351, 925, 1000, 516, 429]#[random.randint(0, 1000) for x in range(10)]
     print list
     print min_n2(list)
     print min_n(list)
-
+    print "start kth mins"
     print kth_min_nlogn(4, list)
     print kth_min_n(4, list)
+    print "kth_min_n_opt1"
+    print kth_min_n_opt1(4, list)
 
 main()
