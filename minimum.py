@@ -29,8 +29,6 @@ def kth_min_nlogn(k, list):
 
 def kth_min_n(k,list):
 # return kth minimum number in a list, O(n) time
-
-# optimization 2: if k > n/2, find n-k max elements
     min = [''] * k
     min[0] = list[0]
     max = list[0]
@@ -80,15 +78,58 @@ def kth_min_n_opt1(k, list):
 
     return min
 
+def kth_min_n_opt2(k, list):
+# optimization 2: if k > n/2, find n+1-k max elements.. searches the list in the opposite
+# direction in the event that k is closer to the end of the list.
+    if k > len(list)/2:
+    # search for n+1-kth max
+        max = [''] * (len(list) + 1 - k)
+        max[0] = list[0]
+        min = list[0]
+        #first find min, max
+        for num in list:
+            if num > max[0]:
+                max[0] = num
+            if num < min:
+                min = num
+        #then fill in max + 1 until we get to kth + 1 max
+        for round in range(1, len(list) + 1 - k):
+            max[round] = min
+            for num in list:
+                if num < max[round - 1] and num > max[round]:
+                    max[round] = num
+        return max[(len(list) - k)]
+    else:
+    # search for kth min
+        min = [''] * k
+        min[0] = list[0]
+        max = list[0]
+        #first find min, max
+        for num in list:
+            if num < min[0]:
+                min[0] = num
+            if num > max:
+                max = num
+        #then fill in min + 1 until we get to kth min
+        for round in range(1, k):
+            min[round] = max
+            for num in list:
+                if num < min[round] and num > min[round - 1]:
+                    min[round] = num
+        return min[k - 1]
+
 def main():
     list = [353, 635, 132, 665, 382, 351, 925, 1000, 516, 429]#[random.randint(0, 1000) for x in range(10)]
+    k = 7
     print list
     print min_n2(list)
     print min_n(list)
     print "start kth mins"
-    print kth_min_nlogn(4, list)
-    print kth_min_n(4, list)
+    print kth_min_nlogn(k, list)
+    print kth_min_n(k, list)
     print "kth_min_n_opt1"
-    print kth_min_n_opt1(4, list)
+    print kth_min_n_opt1(k, list)
+    print "kth_min_n_opt2"
+    print kth_min_n_opt2(k, list)
 
 main()
